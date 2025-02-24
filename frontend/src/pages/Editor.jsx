@@ -4,6 +4,7 @@ import Editor2 from '@monaco-editor/react';
 import { useParams } from 'react-router-dom';
 import { api_base_url } from '../helper';
 import { toast } from 'react-toastify';
+import SnippetGenerator from '../components/SnippetGenerator';
 import axios from "axios";
 const Editor = () => {
   const [code, setCode] = useState("");
@@ -13,6 +14,12 @@ const Editor = () => {
   const [data, setData] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [language, setLanguage] = useState("javascript");
+  // Control the visibility of the snippet generator modal
+  const [showSnippetModal, setShowSnippetModal] = useState(false);
+  const [editorInstance, setEditorInstance] = useState(null);
+  const [selectedText, setSelectedText] = useState("");
+  const [analysisResult, setAnalysisResult] = useState("");
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   useEffect(() => {
     fetch(`${api_base_url}/getProject`, {
       mode: 'cors',
@@ -38,6 +45,23 @@ const Editor = () => {
         toast.error('Failed to load project.');
       });
   }, [id]);
+
+    // Callback to insert a generated snippet into the current code.
+    const handleInsertSnippet = (snippet) => {
+      setCode(prevCode => prevCode + "\n" + snippet);
+      setShowSnippetModal(false);
+    };
+  
+    // Handle Monaco Editor mount to get the editor instance and listen for selection changes
+    const handleEditorMount = (editor, monaco) => {
+      setEditorInstance(editor);
+      editor.onDidChangeCursorSelection(() => {
+        const selection = editor.getSelection();
+        const text = editor.getModel().getValueInRange(selection);
+        setSelectedText(text.trim());
+        console.log("Selected Text:", text.trim());
+      });
+    };
 
   const saveProject = () => {
     fetch(`${api_base_url}/saveProject`, {
@@ -97,6 +121,35 @@ const Editor = () => {
       })
       .catch(err => console.error("Error running code:", err));
   };
+  const handleAnalyzeCode = async () => {
+    if (!selectedText) {
+      toast.error("Please select some code to analyze.");
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:3000/api/analyze-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codeSnippet: selectedText })
+      });
+      const data = await response.json();
+      console.log("Analysis response:", data);
+      setAnalysisResult(formatText(data.analysis));
+      setShowAnalysisModal(true);
+    } catch (error) {
+      console.error("Error analyzing code:", error);
+      toast.error("Error analyzing code");
+    }
+  };
+  function formatText(input) {
+    // const boldPattern = /\*\*(.*?)\*\*/g;
+    // const italicPattern = /\*(.*?)\*/g;
+    // const formattedText = input
+    //     .replace(boldPattern, '<strong>$1</strong>')
+    //     .replace(italicPattern, '<em>$1</em>');
+
+    return input;
+};
 
   const analyzeCode = () => {
     fetch(`http://localhost:3000/api/analyzeCode`, {
@@ -126,16 +179,60 @@ const Editor = () => {
     <>
       <Navbar />
       <div className="flex items-center justify-between" style={{ height: 'calc(100vh - 90px)' }}>
+        
         <div className="left w-[50%] h-full">
+          {/* Floating button for snippet generation */}
+          <div style={{ position: 'absolute', bottom: 15, right: 10, zIndex: 1000 }}>
+            <button
+              onClick={() => setShowSnippetModal(true)}
+              className="btnNormal bg-green-500 transition-all hover:bg-green-600 p-2 rounded-md"
+            >
+              Generate Snippet
+            </button>
+          </div>
+          {/* Floating button for code analysis: appears if there's a non-empty selection */}
+          {selectedText && (
+            <div style={{ position: 'absolute', bottom: 15, left: 10, zIndex: 1000 }}>
+              <button
+                onClick={handleAnalyzeCode}
+                className="btnNormal bg-orange-500 transition-all hover:bg-orange-600 p-2 rounded-md"
+              >
+                Analyze Code
+              </button>
+            </div>
+          )}
           <Editor2
             onChange={(newCode) => setCode(newCode || '')}
             theme="vs-dark"
             height="100%"
             width="100%"
             language={language}
+            onMount={handleEditorMount}
             value={code}
           />
         </div>
+        {/* Floating Snippet Generator Modal */}
+        {showSnippetModal && (
+            <div
+              className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.6)] z-50"
+              onClick={() => setShowSnippetModal(false)}
+            >
+              <div
+                className="bg-[#1e1e1e] p-6 rounded-lg relative"
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: '50%', maxWidth: '600px' }}
+              >
+                <button
+                  onClick={() => setShowSnippetModal(false)}
+                  style={{ position: 'absolute', top: 10, right: 10 }}
+                  className="text-white"
+                >
+                  X
+                </button>
+                <SnippetGenerator onInsert={handleInsertSnippet} lang={data?.projLanguage} />
+              </div>
+            </div>
+          )}
         <div className="right p-[15px] w-[50%] h-full bg-[#27272a]">
           <div className="flex pb-3 border-b-[1px] border-b-[#1e1e1f] items-center justify-between px-[30px]">
             <p className="p-0 m-0">Output</p>
@@ -196,6 +293,51 @@ const Editor = () => {
           )}
         </div>
       </div>
+      {/* Save Project Button */}
+      <div style={{ textAlign: 'center', marginTop: '10px' }}>
+        <button
+          onClick={saveProject}
+          className="btnNormal bg-blue-500 transition-all hover:bg-blue-600"
+          style={{ padding: '10px 20px' }}
+        >
+          Save Project
+        </button>
+      </div>
+      {/* Analysis Result Modal */}
+      {showAnalysisModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.6)] z-50"
+          onClick={() => setShowAnalysisModal(false)}
+        >
+          <div
+            className="bg-[#1e1e1e] p-6 rounded-lg relative"
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: '50%', maxWidth: '600px' }}
+          >
+            <button
+              onClick={() => setShowAnalysisModal(false)}
+              style={{ position: 'absolute', top: 10, right: 10 }}
+              className="text-white"
+            >
+              X
+            </button>
+            <h3 className="text-white mb-4">Code Analysis</h3>
+            <pre
+              style={{
+                background: '#27272a',
+                padding: '10px',
+                borderRadius: '4px',
+                whiteSpace: 'pre-wrap',
+                maxHeight: '300px',
+                overflowY: 'auto',
+                color: '#fff'
+              }}
+            >
+              {analysisResult}
+            </pre>
+          </div>
+        </div>
+      )}
     </>
   );
 };

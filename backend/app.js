@@ -8,7 +8,10 @@ require("dotenv").config();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var analyzeRouter=require('./routes/analysisRoutes')
+const snippetRouter = require('./routes/snippet');
+const codeAnalyseRouter = require('./routes/codeAnalysis');
 const connectDB = require('./config/db');
+
 
 connectDB();
 
@@ -29,6 +32,8 @@ app.use(cors());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api',analyzeRouter);
+app.use('/api', snippetRouter);
+app.use('/api', codeAnalyseRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
