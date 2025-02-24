@@ -1,8 +1,8 @@
 import React from 'react'
 import logo from "../images/logos/logo.png"
 import { Link } from 'react-router-dom'
-
 const Navbar = () => {
+  
   return (
     <>
       <div className="nav flex px-[100px] items-center justify-between h-[90px] bg-[#0f0e0e]">
