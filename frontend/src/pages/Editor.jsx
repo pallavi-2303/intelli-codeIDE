@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { api_base_url } from '../helper';
 import { toast } from 'react-toastify';
 import SnippetGenerator from '../components/SnippetGenerator';
-import axios from "axios";
+import GraphViewer from '../components/GraphViewer'; // Import GraphViewer
 const Editor = () => {
   const [code, setCode] = useState("");
   const { id } = useParams();
@@ -20,6 +20,7 @@ const Editor = () => {
   const [selectedText, setSelectedText] = useState("");
   const [analysisResult, setAnalysisResult] = useState("");
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+
   useEffect(() => {
     fetch(`${api_base_url}/getProject`, {
       mode: 'cors',
@@ -159,22 +160,48 @@ const Editor = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
+        console.log("\n✅ Received API Response:", data); // Debug frontend response
+        console.log("Call Graph:", data.callGraph); // Log before setting state
+        console.log("Defined Functions:", data.definedFunctions); // Log before setting state
+       // ✅ Handle backend errors if present
+       if (data.error) {
+        console.error("Backend Error:", data.error);
+        toast.error(`Error: ${data.error}`);
+        return;
+      }
+      if (
+        (!data.callGraph || Object.keys(data.callGraph).length === 0) &&
+        (!data.definedFunctions || data.definedFunctions.length === 0)
+      ) {
+        toast.info("No functions detected in the code.");
+      }
+
+      if (data.cycleResult?.message === "No cycles found") {
+        toast.info("No cycles detected in the code.");
+      }
+
+      if (data.deadCodeResult?.message === "No dead code") {
+        toast.info("No dead code found.");
+      }
+
         if (data.callGraph && Object.keys(data.callGraph).length > 0) {
       
           setAnalysis(data);
+          console.log(analysis?.callGraph);
+console.log(analysis?.definedFunctions);
           toast.success("Code analysis completed!");
-        } else {
-          console.log(data.error);
-          toast.error("Error analyzing code.");
         }
       })
       .catch(err => {
-        console.error("Error analyzing code:", err);
+        console.error("Error analyzing code: actual Error", err);
         toast.error("Failed to analyze the code.");
       });
   };
-
+  useEffect(() => {
+    console.log("Updated Analysis:", analysis);
+    console.log("Call Graph:", analysis?.callGraph);
+    console.log("Defined Functions:", analysis?.definedFunctions);
+  }, [analysis]);
   return (
     <>
       <Navbar />
@@ -288,7 +315,18 @@ const Editor = () => {
                   </ul>
                 </div>
               )}
+      {/* New Graph Visualization Section */}
+ {analysis.callGraph && analysis.definedFunctions && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-bold text-white">Call Graph Visualization</h3>
+                  <GraphViewer
+                    callGraph={analysis.callGraph}
+                    definedFunctions={analysis.definedFunctions}
+                  />
+                </div>
+              )}    
               </div>
+
             </div> 
           )}
         </div>
