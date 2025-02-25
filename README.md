@@ -42,5 +42,6 @@ Ensure you have the following installed:
 - PORT=3000
 
 ### **🔹 Clone the Repository**  
+```bash
 git clone https://github.com/pallavi-2303/intelli-codeIDE/edit/main/README.md
 cd intelli-codeIDE
