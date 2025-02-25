@@ -11,7 +11,7 @@ def parse_java(file_path):
         call_graph = {}
         defined_functions = set()
 
-        # ✅ Extract function definitions and calls
+        #  Extract function definitions and calls
         for path, node in tree.filter(javalang.tree.MethodDeclaration):
             function_name = node.name
             defined_functions.add(function_name)
@@ -20,15 +20,15 @@ def parse_java(file_path):
             for _, invoc in node.filter(javalang.tree.MethodInvocation):
                 call_graph[function_name].append(invoc.member)
 
-        # ✅ Detect cycles
+        #  Detect cycles
         has_cycles = detect_cycles(call_graph)
         cycle_message = "Cycle detected" if has_cycles else "No cycles found"
 
-        # ✅ Detect dead code
+        # Detect dead code
         called_functions = {callee for callees in call_graph.values() for callee in callees}
         dead_functions = [func for func in defined_functions if func not in called_functions]
 
-        # ✅ Construct result JSON
+        # Construct result JSON
         result = {
             "callGraph": call_graph,
             "definedFunctions": list(defined_functions),
@@ -39,7 +39,7 @@ def parse_java(file_path):
             }
         }
 
-        # ✅ Ensure proper UTF-8 encoding
+        #  Ensure proper UTF-8 encoding
         print(json.dumps(result, indent=4, ensure_ascii=False))
         return result
 
@@ -47,14 +47,14 @@ def parse_java(file_path):
         print(json.dumps({"error": str(e)}, ensure_ascii=False))  # Fix encoding issue
         return {"error": str(e)}
 
-# ✅ Function to detect cycles using DFS
+# Function to detect cycles using DFS
 def detect_cycles(call_graph):
     visited = set()
     stack = set()
 
     def dfs(node):
         if node in stack:
-            return True  # Cycle detected
+            return True  
         if node in visited:
             return False
 
@@ -73,7 +73,7 @@ def detect_cycles(call_graph):
             return True
     return False
 
-# ✅ Run Java parser
+#  Run Java parser
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(json.dumps({"error": "No file path provided"}, ensure_ascii=False))

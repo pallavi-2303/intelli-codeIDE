@@ -1,6 +1,4 @@
-// "Authorization": "Bearer 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"
-// routes/snippet.js
-// routes/snippet.js
+
 const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -21,11 +19,11 @@ const generationConfig = {
 // Inline prompt builder: cleans user input and returns a detailed instruction.
 const buildCodePrompt = (userInput, language) => {
   let cleanedPrompt = userInput.trim();
-  // Remove comment markers if present
+ 
   if (cleanedPrompt.startsWith('//')) {
     cleanedPrompt = cleanedPrompt.substring(2).trim();
   }
-  // Build a clear prompt that instructs the model to output only code.
+  
   return `You are a code generation assistant. Generate a ${language} function that ${cleanedPrompt}. Return only the code snippet without any additional explanation, comments, or text or example.Only give the code asked for.
 
 Code:`;

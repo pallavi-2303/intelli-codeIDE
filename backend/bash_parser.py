@@ -7,24 +7,24 @@ def parse_bash(file_path):
         with open(file_path, "r") as f:
             code = f.read()
         
-        parsed = bashlex.parse(code)  # Parse Bash script
-        call_graph = {}  # Stores function calls
-        defined_functions = []  # Stores function definitions
+        parsed = bashlex.parse(code)  
+        call_graph = {}  
+        defined_functions = []  
 
         # ✅ Extract function definitions
         for node in parsed:
             if isinstance(node, bashlex.ast.node) and node.kind == "function":
-                function_name = node.parts[0].word  # ✅ Extract correct function name
+                function_name = node.parts[0].word  
                 defined_functions.append(function_name)
-                call_graph[function_name] = []  # Initialize empty call graph
+                call_graph[function_name] = [] 
 
-        # ✅ Extract function calls inside other functions
+        #  Extract function calls inside other functions
         for node in parsed:
             if isinstance(node, bashlex.ast.node) and node.kind == "command":
                 if hasattr(node, "parts") and node.parts:
-                    command_name = node.parts[0].word  # ✅ Extract correct command
+                    command_name = node.parts[0].word  
                     for function_name in defined_functions:
-                        if function_name in code:  # ✅ Check function body
+                        if function_name in code:  
                             call_graph[function_name].append(command_name)
 
         return {"callGraph": call_graph, "definedFunctions": defined_functions}
@@ -40,5 +40,5 @@ if __name__ == "__main__":
     file_path = sys.argv[1]
     result = parse_bash(file_path)
 
-    # ✅ Ensure valid JSON output
+    #  Ensure valid JSON output
     print(json.dumps(result, indent=4))

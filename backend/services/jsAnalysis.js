@@ -5,7 +5,7 @@ const traverse = require("@babel/traverse").default;
 function analyzeJSCode(code) {
     const ast = parser.parse(code, { sourceType: "module" });
     let graph = {};
-    let definedFunctions = new Set(); // ✅ Initialize definedFunctions
+    let definedFunctions = new Set(); 
 
     traverse(ast, {
         FunctionDeclaration(path) {

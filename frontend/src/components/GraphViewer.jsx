@@ -15,7 +15,7 @@ const GraphViewer = ({ callGraph = {}, definedFunctions = [] }) => {
       functionList = new Set(Object.keys(definedFunctions));
     }
 
-    // Collect all unique functions (both callers & callees)
+    // Colllect all unique functions 
     Object.entries(callGraph).forEach(([caller, callees]) => {
       functionList.add(caller);
       if (Array.isArray(callees)) {
@@ -27,9 +27,9 @@ const GraphViewer = ({ callGraph = {}, definedFunctions = [] }) => {
 
     // Define a grid-based fixed layout (to keep nodes centered)
     const nodePositions = {};
-    const centerX = 300; // Center X position
-    const centerY = 200; // Center Y position
-    const radius = 150; // Distance from the center
+    const centerX = 300; 
+    const centerY = 200;
+    const radius = 150; 
     const totalNodes = functionList.size;
     let index = 0;
 
@@ -43,7 +43,7 @@ const GraphViewer = ({ callGraph = {}, definedFunctions = [] }) => {
 
       return {
         data: { id: func, label: func },
-        position: { x, y }, // Fixed position
+        position: { x, y }, 
       };
     });
 
@@ -57,8 +57,8 @@ const GraphViewer = ({ callGraph = {}, definedFunctions = [] }) => {
       }
     });
 
-    console.log("📌 Generated Nodes:", nodes);
-    console.log("📌 Generated Edges:", edges);
+    console.log(" Generated Nodes:", nodes);
+    console.log(" Generated Edges:", edges);
 
     setElements([...nodes, ...edges]);
   }, [callGraph, definedFunctions]);
@@ -68,11 +68,11 @@ const GraphViewer = ({ callGraph = {}, definedFunctions = [] }) => {
       <CytoscapeComponent
         elements={elements}
         style={{ width: "100%", height: "100%" }}
-        layout={{ name: "preset" }} // Use fixed node positions
+        layout={{ name: "preset" }} 
         cy={(cy) => {
-          cy.zoomingEnabled(false); // Disable zoom to keep the graph size fixed
-          cy.center(); // Keep the graph centered
-          cy.fit(); // Adjust to fit within the viewport
+          cy.zoomingEnabled(false); 
+          cy.center(); 
+          cy.fit(); 
         }}
         stylesheet={[
           {
@@ -84,7 +84,7 @@ const GraphViewer = ({ callGraph = {}, definedFunctions = [] }) => {
               color: "#fff",
               "font-size": "12px",
               "text-halign": "center",
-              width: "40px", // Fixed node size
+              width: "40px", 
               height: "40px",
             },
           },

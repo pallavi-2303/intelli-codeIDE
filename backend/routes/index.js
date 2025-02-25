@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.post("/signUp", signUp); // signUp is the controller function
+router.post("/signUp", signUp); 
 router.post("/login", login); 
 router.post("/createProj", createProj); 
 router.post("/saveProject", saveProject); 

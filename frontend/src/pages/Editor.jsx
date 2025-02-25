@@ -5,9 +5,8 @@ import { useParams } from "react-router-dom";
 import { api_base_url } from "../helper";
 import { toast } from "react-toastify";
 import SnippetGenerator from "../components/SnippetGenerator";
-import GraphViewer from "../components/GraphViewer"; // Import GraphViewer
+import GraphViewer from "../components/GraphViewer"; 
 import Split from "react-split";
-// ✅ Import resizable panels
 
 const Editor = () => {
   const [code, setCode] = useState("");
@@ -17,7 +16,6 @@ const Editor = () => {
   const [data, setData] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [language, setLanguage] = useState("javascript");
-  // Control the visibility of the snippet generator modal
   const [showSnippetModal, setShowSnippetModal] = useState(false);
   const [editorInstance, setEditorInstance] = useState(null);
   const [selectedText, setSelectedText] = useState("");
@@ -148,12 +146,7 @@ const Editor = () => {
     }
   };
   function formatText(input) {
-    // const boldPattern = /\*\*(.*?)\*\*/g;
-    // const italicPattern = /\*(.*?)\*/g;
-    // const formattedText = input
-    //     .replace(boldPattern, '<strong>$1</strong>')
-    //     .replace(italicPattern, '<em>$1</em>');
-
+  
     return input;
   }
 
@@ -165,10 +158,10 @@ const Editor = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("\n✅ Received API Response:", data); // Debug frontend response
-        console.log("Call Graph:", data.callGraph); // Log before setting state
-        console.log("Defined Functions:", data.definedFunctions); // Log before setting state
-        // ✅ Handle backend errors if present
+        console.log("\n✅ Received API Response:", data); 
+        console.log("Call Graph:", data.callGraph); 
+        console.log("Defined Functions:", data.definedFunctions); 
+        //  Handling Errors if anny occur
         if (data.error) {
           console.error("Backend Error:", data.error);
           toast.error(`Error: ${data.error}`);
@@ -217,10 +210,7 @@ const Editor = () => {
           direction="horizontal"
           style={{ display: "flex", height: "100%" }}
         >
-          {/* <div
-            className="flex items-center justify-between"
-            style={{ height: "calc(100vh - 90px)" }}
-          > */}
+         
             <div classname="realative" style={{ height: "100%"}}>
               {/* Floating button for snippet generation */}
               <div
@@ -256,7 +246,7 @@ const Editor = () => {
                   </button>
                 </div>
               )}
-              {/* Left Panel - Code Editor */}
+            
 
               <Editor2
                 onChange={(newCode) => setCode(newCode || "")}
@@ -293,9 +283,7 @@ const Editor = () => {
                 </div>
               </div>
             )}
-            {/* Resizable Handle */}
-
-            {/* Right Panel - Output & Analysis */}
+           
 
             <div style={{ height: "100%", overflow: "auto", background: "#27272a", padding: "15px"}}>
             <div className="flex pb-3 border-b-[1px] border-b-[#1e1e1f] items-center justify-between px-[30px]">
@@ -343,7 +331,7 @@ const Editor = () => {
                         </pre>
                       </div>
                     )}
-                    {/* ✅ Display Dead Code Analysis Results */}
+                    {/*  Display Dead Code Analysis Results */}
                     {analysis.deadCodeResult && (
                       <div className="mt-2">
                         <h4 className="font-semibold">Dead Code Detection:</h4>

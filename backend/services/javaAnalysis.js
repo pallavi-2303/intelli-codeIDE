@@ -8,18 +8,18 @@ function analyzeJavaCode(code) {
 
     try {
         const output = execSync(`python java_parser.py ${tempFilePath}`).toString();
-        console.log("\n🔹 RAW PARSER OUTPUT:", output); // ✅ Debugging
+        console.log("\n🔹 RAW PARSER OUTPUT:", output); 
         const result = JSON.parse(output);
 
-        // ✅ Validate Call Graph
+        //  Validate Call Graph
         if (!result.callGraph || Object.keys(result.callGraph).length === 0) {
-            console.error("❌ Invalid Call Graph:", result);
+            console.error(" Invalid Call Graph:", result);
             return { callGraph: {}, definedFunctions: [], error: "Invalid call graph provided" };
         }
 
         return result;
     } catch (error) {
-        console.error("❌ Java code analysis error:", error);
+        console.error(" Java code analysis error:", error);
         return { callGraph: {}, definedFunctions: [], error: "Failed to analyze Java code" };
     } finally {
         fs.unlinkSync(tempFilePath);
@@ -53,7 +53,7 @@ function detectCyclesJava(callGraph) {
     return Object.keys(callGraph).some(dfs) ? { message: "Cycle detected" } : { message: "No cycles found" };
 }
 
-// ✅ Fix Dead Code Detection
+//  Fix Dead Code Detection
 function detectDeadCodeJava(callGraph, definedFunctions) {
     if (!callGraph || typeof callGraph !== "object" || Object.keys(callGraph).length === 0 || !Array.isArray(definedFunctions)) {
         return { message: "Invalid input for dead code detection" };

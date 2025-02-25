@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 
 const SnippetGenerator = ({ onInsert ,lang}) => {
   const [prompt, setPrompt] = useState("");
-  // const [language, setLanguage] = useState("Python"); // Default language; you can extend this with a dropdown.
   const [generatedSnippet, setGeneratedSnippet] = useState("");
 
   function formatSnippet(rawSnippet) {
@@ -16,7 +15,6 @@ const SnippetGenerator = ({ onInsert ,lang}) => {
     if (lines[0].startsWith('```')) {
       lines.shift();
     }
-    // If the last line ends with triple backticks, remove it.
     if (lines[lines.length - 1].endsWith('```')) {
       lines.pop();
     }
@@ -71,8 +69,8 @@ const SnippetGenerator = ({ onInsert ,lang}) => {
       padding: '10px', 
       borderRadius: '4px', 
       whiteSpace: 'pre-wrap', 
-      maxHeight: '300px',   // Set a max height
-      overflowY: 'auto'     // Enable vertical scrolling if content exceeds the max height
+      maxHeight: '300px',   
+      overflowY: 'auto'     
     }}>
             {generatedSnippet}
           </pre>

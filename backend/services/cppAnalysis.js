@@ -16,7 +16,7 @@ function analyzeCppCode(code) {
     }
 }
 
-// ✅ Function to detect cycles in the call graph
+//  Function to detect cycles in the call graph
 function detectCyclesCpp(callGraph) {
     const visited = new Set();
     const stack = new Set();

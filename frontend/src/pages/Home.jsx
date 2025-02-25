@@ -259,7 +259,7 @@ const Home = () => {
               placeholder="Select a Language"
               options={languageOptions}
               styles={customStyles}
-              onChange={handleLanguageChange} // Handle language selection
+              onChange={handleLanguageChange} 
             />
             {selectedLanguage && (
               <>
