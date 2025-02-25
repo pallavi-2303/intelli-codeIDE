@@ -2,7 +2,7 @@ const { analyzeJSCode, detectCyclesJS, detectDeadCode } = require("../services/j
 const { analyzeJavaCode, detectCyclesJava, detectDeadCodeJava } = require("../services/javaAnalysis");
 const { analyzeCppCode, detectCyclesCpp, detectDeadCodeCpp } = require("../services/cppAnalysis");
 const { analyzeBashCode, detectCyclesBash, detectDeadCodeBash } = require("../services/bashAnalysis");
-
+//analizer for code analysis of languages
 exports.analyzeCode = (req, res) => {
     try {
         const { code, language } = req.body;
