@@ -8,6 +8,7 @@ exports.analyzeCode = (req, res) => {
         const { code, language } = req.body;
         if (!code) return res.status(400).json({ message: "No code provided" });
 
+
         let callGraph = {}; // ✅ Ensure it's always an object
         let cycleResult = { message: "No cycles found" }; // ✅ Default cycle result
         let deadCodeResult = []; // ✅ Default dead code array
@@ -58,6 +59,7 @@ exports.analyzeCode = (req, res) => {
                 return res.status(400).json({ message: "Unsupported language" });
         }
 console.log(definedFunctions);
+
         res.json({ callGraph, cycleResult, deadCodeResult,  definedFunctions: Array.from(definedFunctions) })// Convert Set to array });
     } catch (error) {
         console.error("Error analyzing code:", error);

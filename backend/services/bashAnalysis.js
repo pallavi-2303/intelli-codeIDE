@@ -3,83 +3,49 @@ const fs = require("fs");
 const path = require("path");
 
 function analyzeBashCode(code) {
+    if (!code || typeof code !== "string" || code.trim() === "") {
+        return { error: "Invalid Bash code provided" };
+    }
+
     const tempFilePath = path.join(__dirname, "temp.sh");
     fs.writeFileSync(tempFilePath, code);
 
     try {
-        const output = execSync(`python3 bash_parser.py ${tempFilePath}`).toString().trim();
+        if (!fs.existsSync("bash_parser.py")) {
+            throw new Error("bash_parser.py not found in directory.");
+        }
 
+        const output = execSync(`python bash_parser.py ${tempFilePath}`, { encoding: "utf-8" }).trim();
         if (!output) {
             return { error: "No output received from parser" };
         }
 
         let parsedData;
         try {
+            console.log("Raw Output from bash_parser.py:", output);
             parsedData = JSON.parse(output);
         } catch (err) {
-            return { error: "Failed to parse JSON output" };
+            console.error("JSON Parse Error:", err.message, "Raw Output:", output);
+            return { error: `Failed to parse JSON: ${err.message}` };
         }
 
-        if (!parsedData.functions || typeof parsedData.functions !== "object") {
-            return { error: "Invalid parser response format" };
+        // ✅ Ensure required fields exist
+        if (!parsedData.callGraph || typeof parsedData.callGraph !== "object") {
+            parsedData.callGraph = {}; // Default empty object
+        }
+        if (!parsedData.definedFunctions || !Array.isArray(parsedData.definedFunctions)) {
+            parsedData.definedFunctions = []; // Default empty array
         }
 
         return parsedData;
     } catch (error) {
+        console.error("Bash analysis failed:", error.message);
         return { error: `Failed to analyze Bash code: ${error.message}` };
     } finally {
-        fs.unlinkSync(tempFilePath);
-    }
-}
-
-// ✅ Function to detect cycles in the call graph
-function detectCyclesBash(callGraph) {
-    if (!callGraph || typeof callGraph !== "object" || Object.keys(callGraph).length === 0) {
-        return { error: "Invalid call graph provided" };
-    }
-
-    const visited = new Set();
-    const stack = new Set();
-
-    function dfs(node) {
-        if (stack.has(node)) return true; // Cycle detected
-        if (visited.has(node)) return false;
-
-        visited.add(node);
-        stack.add(node);
-
-        for (let neighbor of callGraph[node] || []) {
-            if (dfs(neighbor)) return true;
-        }
-
-        stack.delete(node);
-        return false;
-    }
-
-    return { hasCycle: Object.keys(callGraph).some(dfs) };
-}
-
-// ✅ Function to detect dead code in Bash scripts
-function detectDeadCodeBash(graph, definedFunctions) {
-    if (!graph || typeof graph !== "object" || Object.keys(graph).length === 0) {
-        return { error: "Invalid graph provided" };
-    }
-    if (!Array.isArray(definedFunctions) || definedFunctions.length === 0) {
-        return { error: "Invalid defined functions list provided" };
-    }
-
-    let calledFunctions = new Set();
-
-    for (const calls of Object.values(graph)) {
-        if (Array.isArray(calls)) {
-            calls.forEach(func => calledFunctions.add(func));
+        if (fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
         }
     }
-
-    let deadFunctions = definedFunctions.filter(func => !calledFunctions.has(func));
-
-    return { deadFunctions, message: deadFunctions.length > 0 ? "Dead code found" : "No dead code" };
 }
 
-// ✅ Export functions
-module.exports = { analyzeBashCode, detectCyclesBash, detectDeadCodeBash };
+module.exports = { analyzeBashCode };
